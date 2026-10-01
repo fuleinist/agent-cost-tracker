@@ -160,6 +160,7 @@ async function main(): Promise<void> {
       const headers = [by, "entries", "tokens_in", "tokens_out", "cost", "share"];
       const rows = rep.rows.map((r) => [r.key, r.entries, r.tokensIn, r.tokensOut, fmtUsd(r.cost), `${r.pct}%`]);
       if (format === "json") console.log(JSON.stringify(rep, null, 2));
+      else if (format === "csv") console.log(toCsv(headers, rows));
       else {
         console.log(`Spend report — range: ${rep.range}${rep.startIso ? ` (${rep.startIso.slice(0, 10)} → ${rep.endIso?.slice(0, 10)})` : ""}, grouped by ${by}`);
         console.log(rows.length ? renderTable(headers, rows) : "(no entries in range)");

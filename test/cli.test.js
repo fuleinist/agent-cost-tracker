@@ -90,7 +90,7 @@ test("report groups by agent/project/model with correct totals (AC2)", () => {
     assert.equal(r.status, 0);
     const lines = r.stdout.trim().split("\n");
     assert.match(lines[0], /^model,entries,tokens_in,tokens_out,cost,share$/);
-    assert.equal(lines.length, 4); // header + 3 groups (claude/sonnet, cursor/(unknown))... actually 3 rows
+    assert.equal(lines.length, 3); // header + 2 groups (claude-code/sonnet, cursor/(unknown model))
   } finally { rmSync(env.dir, { recursive: true, force: true }); }
 });
 
@@ -161,7 +161,6 @@ test("serve dashboard returns HTML and JSON summary (AC5)", async () => {
     const port = probe.address().port;
     probe.close();
 
-    const child = spawnSync === undefined ? null : null; // placeholder no-op
     const { spawn } = await import("node:child_process");
     const srv = spawn(process.execPath, [CLI, "serve", "--port", String(port)], { env: { ...process.env, ...env }, stdio: "ignore" });
     try {
@@ -188,8 +187,9 @@ test("serve dashboard returns HTML and JSON summary (AC5)", async () => {
       assert.equal(nf.status, 404);
     } finally {
       srv.kill();
+      await new Promise((r) => srv.on("exit", r));
     }
-  } finally { rmSync(env.dir, { recursive: true, force: true }); }
+  } finally { rmSync(env.dir, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 }); }
 });
 
 test("weekly digest contains required sections (AC7)", () => {
@@ -212,8 +212,7 @@ test("weekly digest contains required sections (AC7)", () => {
     const data = JSON.parse(j.stdout);
     assert.equal(data.total, 5);
     assert.equal(data.byAgent.length, 2);
-    // explicit week key
-    const { weekKey } = { weekKey: null };
+    // explicit week key with no data
     const k = act(["weekly", "--week", "2020-W01", "--format", "json"], env);
     assert.equal(JSON.parse(k.stdout).total, 0);
   } finally { rmSync(env.dir, { recursive: true, force: true }); }
