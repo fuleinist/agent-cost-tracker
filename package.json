@@ -1,0 +1,23 @@
+{
+  "name": "agent-cost-tracker",
+  "version": "0.1.0",
+  "description": "Cross-agent AI coding cost dashboard — track spending across Claude Code, Cursor, Copilot, Codex and more, with per-project breakdowns, weekly reports, and budget alerts.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "act": "dist/cli.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "node --test \"test/*.test.js\"",
+    "pretest": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "@types/node": "^24.0.0"
+  }
+}
